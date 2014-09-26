@@ -74,8 +74,10 @@ function(Tooltip) {
 			tmpBBox.height + TOOLTIP_PADDING_TOP + TOOLTIP_PADDING_BOTTOM - 3,
 			TOOLTIP_BORDER_RADIUS
 		);
+
 		tooltipBG.addClass(this.colorClass);
 		this._tooltipBG = tooltipBG;
+		var tooltipBGBBox = tooltipBG.getBBox();
 
 		if (secondaryText) {
 			var tooltipBGBBox = tooltipBG.getBBox();
@@ -92,6 +94,24 @@ function(Tooltip) {
 				});
 		}
 
+		var tooltipBGOverlay = paper.rect(
+			tooltipBGBBox.x,
+			tooltipBGBBox.y,
+			tooltipBGBBox.width,
+			tooltipBGBBox.height,
+			TOOLTIP_BORDER_RADIUS
+		);
+		var tooltipBGMask = paper.rect(
+			this.groupBoundary,
+			tooltipBGBBox.y,
+			tooltipBGBBox.width - this.groupBoundary,
+			tooltipBGBBox.height
+		)
+			.attr('fill', 'white');
+		tooltipBGOverlay.attr('mask', tooltipBGMask);
+		tooltipBGOverlay.addClass(this.colorClass + ' tint-1');
+
+
 		// Render the arrow
 		var tooltipArrow = paper.polygon([-3.5, 0.2, 6.5, -5, 6.5, 5]);
 		var tooltipArrowMask = paper.rect(-6, -6, 11, 12).attr("fill", "#fff");
@@ -104,6 +124,7 @@ function(Tooltip) {
 
 		// Add to the group
 		this.node.append(tooltipBG);
+		this.node.append(tooltipBGOverlay);
 		this.node.append(tooltipText);
 		this.node.append(tooltipArrow);
 		this.node.append(separator);
@@ -131,6 +152,7 @@ function(Tooltip) {
 				transformMatrix.translate(tooltipBGBBox.width + 4, tooltipBGBBox.height / 2);
 				transformMatrix.rotate(180);
 				this._tooltipArrow.transform( transformMatrix.toTransformString() );
+				this._tooltipArrow.addClass('tint-1');
 				break;
 
 			case "right":
@@ -154,6 +176,7 @@ function(Tooltip) {
 				transformMatrix.translate((tooltipBGBBox.width + this.groupBoundary) / 2, tooltipBGBBox.height + 4);
 				transformMatrix.rotate(-90);
 				this._tooltipArrow.transform(transformMatrix.toTransformString());
+				this._tooltipArrow.addClass('tint-1');
 				break;
 
 			case "bottomRight":
@@ -166,6 +189,7 @@ function(Tooltip) {
 				transformMatrix.translate((tooltipBGBBox.width + this.groupBoundary) / 2, -4);
 				transformMatrix.rotate(90);
 				this._tooltipArrow.transform(transformMatrix.toTransformString());
+				this._tooltipArrow.addClass('tint-1');
 				break;
 
 		}
