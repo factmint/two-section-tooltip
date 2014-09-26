@@ -17,5 +17,8 @@
     "bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "dependencies": {
+    "Tooltip": "https://git.assembla.com/descartes_diaphragm.tooltip.git"
+  }
 }
