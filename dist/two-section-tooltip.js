@@ -1,8 +1,6 @@
-define(['tooltip', 'multitext'],
+define(['tooltip'],
 function(Tooltip) {
 
-	var TOOLTIP_OFFSET_X = 10;
-	var TOOLTIP_OFFSET_Y = 20;
 	var TOOLTIP_PADDING_TOP = 5;
 	var TOOLTIP_PADDING_BOTTOM = 10;
 	var TOOLTIP_PADDING_LEFT = 10;
@@ -23,7 +21,7 @@ function(Tooltip) {
 
 	TwoSectionTooltip.prototype = Object.create(Tooltip.prototype);
 
-	TwoSectionTooltip.prototype.render = function(title, mainText, secondaryText) {
+	TwoSectionTooltip.prototype.render = function(mainText, secondaryText) {
 
 		var paper = this._paper;
 		var tmpBBox = null;
@@ -37,83 +35,27 @@ function(Tooltip) {
 		var tooltipText;
 		var tooltipText = paper.g();
 
-		var titleText = paper.text(TOOLTIP_PADDING_LEFT, TOOLTIP_PADDING_TOP, title)
-		titleText.attr({
-			"dy": parseInt(TEXT_SIZE_SMALL, 10),
-		});
+		var titleText = paper.text(
+			TOOLTIP_PADDING_LEFT,
+			TOOLTIP_PADDING_TOP,
+			mainText
+		)
+			.attr({
+				"dy": parseInt(TEXT_SIZE_SMALL, 10),
+			});
 		tooltipText.append(titleText);
 
-		var detailTitles = [];
-		var detailValues = [];
-		details.forEach(function(detail) {
-			detailTitles.push(detail.title + ':');
-			detailValues.push(detail.value);
-		});
-
-		var detailTitlesElement = paper.multitext(
-			TOOLTIP_PADDING_LEFT,
-			TOOLTIP_PADDING_TOP + GROUP_SPACING + titleText.getBBox().height,
-			detailTitles.join('\n'),
-			TOOLTIP_LINE_HEIGHT + 'em'
-		);
-
-		var detailValuesElement = paper.multitext(
-			TOOLTIP_PADDING_LEFT,
-			TOOLTIP_PADDING_TOP + GROUP_SPACING + titleText.getBBox().height,
-			detailValues.join('\n'),
-			TOOLTIP_LINE_HEIGHT + 'em',
-			'end'
-		);
-
-		var extraDetailTitles = [];
-		var extraDetailValues = [];
-		extraDetails.forEach(function(detail) {
-			extraDetailTitles.push(detail.title + ':');
-			extraDetailValues.push(detail.value);
-		});
-
-		var extraDetailTitlesElement = paper.multitext(
-			TOOLTIP_PADDING_LEFT,
-			TOOLTIP_PADDING_TOP + GROUP_SPACING * 2 + titleText.getBBox().height + detailTitlesElement.getBBox().height,
-			extraDetailTitles.join('\n'),
-			TOOLTIP_LINE_HEIGHT + 'em'
-		)
-
-		var extraDetailValuesElement = paper.multitext(
-			TOOLTIP_PADDING_LEFT,
-			TOOLTIP_PADDING_TOP + GROUP_SPACING * 2 + titleText.getBBox().height + detailTitlesElement.getBBox().height,
-			extraDetailValues.join('\n'),
-			TOOLTIP_LINE_HEIGHT + 'em',
-			'end'
-		);
-
-		var detailTitlesElementBBox = detailTitlesElement.getBBox();
-		var extraDetailTitlesElementBBox = extraDetailTitlesElement.getBBox();
-
-		var largestTitlesElementWidth;
-		if (detailTitlesElementBBox.width > extraDetailTitlesElementBBox.width) {
-			largestTitlesElementWidth = detailTitlesElementBBox.width;
-		} else {
-			largestTitlesElementWidth = extraDetailTitlesElementBBox.width;
+		if (secondaryText) {
+			var valueText = paper.text(
+				TOOLTIP_PADDING_LEFT + titleText.getBBox().width + GROUP_SPACING,
+				TOOLTIP_PADDING_TOP,
+				secondaryText
+			)
+				.attr({
+					"dy": parseInt(TEXT_SIZE_SMALL, 10),
+				});
+			tooltipText.append(valueText);
 		}
-
-		var detailValuesElementBBox = detailValuesElement.getBBox();
-		var extraDetailValuesElementBBox = extraDetailValuesElement.getBBox();
-
-		var largestValuesElementWidth;
-		if (detailValuesElementBBox.width > extraDetailValuesElementBBox.width) {
-			largestValuesElementWidth = detailValuesElementBBox.width;
-		} else {
-			largestValuesElementWidth = extraDetailValuesElementBBox.width;
-		}
-
-		detailValuesElement.transform('t ' + (largestTitlesElementWidth + largestValuesElementWidth) + ' 0');
-		extraDetailValuesElement.transform('t ' + (largestTitlesElementWidth + largestValuesElementWidth) + ' 0');
-		
-		tooltipText.append(detailTitlesElement);
-		tooltipText.append(detailValuesElement);
-		tooltipText.append(extraDetailTitlesElement);
-		tooltipText.append(extraDetailValuesElement);
 
 		tooltipText.attr({
 			"fill": "#fff",
@@ -129,26 +71,26 @@ function(Tooltip) {
 			0,
 			0,
 			tmpBBox.width + TOOLTIP_PADDING_RIGHT + TOOLTIP_PADDING_LEFT,
-			tmpBBox.height + TOOLTIP_PADDING_TOP + TOOLTIP_PADDING_BOTTOM,
+			tmpBBox.height + TOOLTIP_PADDING_TOP + TOOLTIP_PADDING_BOTTOM - 3,
 			TOOLTIP_BORDER_RADIUS
 		);
 		tooltipBG.addClass(this.colorClass);
 		this._tooltipBG = tooltipBG;
 
-		var tooltipBGBBox = tooltipBG.getBBox();
-		this.groupBoundary = TOOLTIP_PADDING_TOP + GROUP_SPACING + titleText.getBBox().height + detailTitlesElement.getBBox().height;
+		if (secondaryText) {
+			var tooltipBGBBox = tooltipBG.getBBox();
+			this.groupBoundary = TOOLTIP_PADDING_LEFT + GROUP_SPACING + titleText.getBBox().width;
 
-		var separator = paper.line(
-			0,
-			this.groupBoundary,
-			tooltipBGBBox.width,
-			this.groupBoundary
-		)
-			.attr({
-				stroke: 'white'
-			});
-
-		titleText.transform('t ' + (tmpBBox.width / 2 - titleText.getBBox().width / 2) + ' 0');
+			var separator = paper.line(
+				this.groupBoundary,
+				0,
+				this.groupBoundary,
+				tooltipBGBBox.height
+			)
+				.attr({
+					stroke: 'white'
+				});
+		}
 
 		// Render the arrow
 		var tooltipArrow = paper.polygon([-3.5, 0.2, 6.5, -5, 6.5, 5]);
@@ -173,6 +115,11 @@ function(Tooltip) {
 		return this.node;
 	};
 
+	/**
+	 * Repositions the arrow based on the tooltipPlacement
+	 * @private
+	 * @param {String} tooltipPlacement Can be left, right, top or bottom
+	 */
 	TwoSectionTooltip.prototype._positionTooltipArrow = function(tooltipPlacement) {
 
 		var transformMatrix = Snap.matrix();
@@ -181,13 +128,13 @@ function(Tooltip) {
 		switch(tooltipPlacement){
 
 			case "left":
-				transformMatrix.translate(tooltipBGBBox.width + 4, this.groupBoundary / 2 + 3);
+				transformMatrix.translate(tooltipBGBBox.width + 4, tooltipBGBBox.height / 2);
 				transformMatrix.rotate(180);
 				this._tooltipArrow.transform( transformMatrix.toTransformString() );
 				break;
 
 			case "right":
-				transformMatrix.translate(-4, this.groupBoundary / 2 + 3);
+				transformMatrix.translate(-4, tooltipBGBBox.height / 2);
 				this._tooltipArrow.transform( transformMatrix.toTransformString() );
 				break;
 
@@ -197,8 +144,26 @@ function(Tooltip) {
 				this._tooltipArrow.transform(transformMatrix.toTransformString());
 				break;
 
-			case "bottom":
-				transformMatrix.translate(tooltipBGBBox.width / 2, -4);
+			case "topRight":
+				transformMatrix.translate(this.groupBoundary / 2, tooltipBGBBox.height + 4);
+				transformMatrix.rotate(-90);
+				this._tooltipArrow.transform(transformMatrix.toTransformString());
+				break;
+
+			case "topLeft":
+				transformMatrix.translate((tooltipBGBBox.width + this.groupBoundary) / 2, tooltipBGBBox.height + 4);
+				transformMatrix.rotate(-90);
+				this._tooltipArrow.transform(transformMatrix.toTransformString());
+				break;
+
+			case "bottomRight":
+				transformMatrix.translate(this.groupBoundary / 2, -4);
+				transformMatrix.rotate(90);
+				this._tooltipArrow.transform(transformMatrix.toTransformString());
+				break;
+
+			case "bottomLeft":
+				transformMatrix.translate((tooltipBGBBox.width + this.groupBoundary) / 2, -4);
 				transformMatrix.rotate(90);
 				this._tooltipArrow.transform(transformMatrix.toTransformString());
 				break;
@@ -206,6 +171,70 @@ function(Tooltip) {
 		}
 
 		this._tooltipPlacement = tooltipPlacement;
+
+	};
+
+	/**
+	 * Sets the position for the tooltip to go
+	 * @param {Number} x								
+	 * @param {Number} y								
+	 * @param {String} tooltipPlacement The position for the tooltip to go
+	 */
+	TwoSectionTooltip.prototype.setPosition = function(x, y, tooltipPlacement) {
+
+		if (!this.node) {
+			return;
+		}
+
+		if( tooltipPlacement === undefined ){
+			tooltipPlacement = this._tooltipPlacement;
+		} else if(tooltipPlacement !== this._tooltipPlacement) {
+			this._positionTooltipArrow(tooltipPlacement);
+		}
+
+		var tooltipArrowBBox = this._tooltipArrow.getBBox();
+		var tooltipBGBBox = this._tooltipBG.getBBox();
+
+		switch(tooltipPlacement) {
+
+			case "left":
+				x = x - tooltipArrowBBox.width - tooltipBGBBox.width;
+				y = y - tooltipBGBBox.height / 2;
+				break;
+
+			case "right":
+				x = x + tooltipArrowBBox.width;
+				y = y - tooltipBGBBox.height / 2;
+				break;
+
+			case "top":
+				x = x - tooltipBGBBox.width / 2;
+				y = y - tooltipBGBBox.height - tooltipArrowBBox.height;
+				break;
+
+			case "topRight":
+				x = x - this.groupBoundary / 2;
+				y = y - tooltipBGBBox.height - tooltipArrowBBox.height;
+				break;
+
+			case "topLeft":
+				x = x - (tooltipBGBBox.width + this.groupBoundary) / 2;
+				y = y - tooltipBGBBox.height - tooltipArrowBBox.height;
+				break;
+
+			case "bottomRight":
+				x = x - this.groupBoundary / 2;
+				y = y + tooltipArrowBBox.height;
+				break;
+
+			case "bottomLeft":
+				x = x - (tooltipBGBBox.width + this.groupBoundary) / 2;
+				y = y + tooltipArrowBBox.height;
+				break;
+
+		}
+
+		this.node.transform("T" + x + "," + y);
 
 	};
 
