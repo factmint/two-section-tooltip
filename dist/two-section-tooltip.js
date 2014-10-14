@@ -45,18 +45,6 @@ function(Tooltip) {
 			});
 		tooltipText.append(titleText);
 
-		if (secondaryText) {
-			var valueText = paper.text(
-				TOOLTIP_PADDING_LEFT + titleText.getBBox().width + GROUP_SPACING,
-				TOOLTIP_PADDING_TOP,
-				secondaryText
-			)
-				.attr({
-					"dy": parseInt(TEXT_SIZE_SMALL, 10),
-				});
-			tooltipText.append(valueText);
-		}
-
 		tooltipText.attr({
 			"fill": "#fff",
 			"font-family": FONT_FAMILY,
@@ -64,6 +52,23 @@ function(Tooltip) {
 		});
 
 		this._tooltipText = tooltipText;
+
+		if (secondaryText) {
+			var titleTextBBox = titleText.getBBox();
+
+			var valueText = paper.text(
+				TOOLTIP_PADDING_LEFT + titleTextBBox.width + GROUP_SPACING * 2,
+				TOOLTIP_PADDING_TOP,
+				secondaryText
+			)
+				.attr({
+					"dy": parseInt(TEXT_SIZE_SMALL, 10),
+					"text-anchor": "left"
+				});
+			tooltipText.append(valueText);
+
+			this.groupBoundary = TOOLTIP_PADDING_LEFT + GROUP_SPACING + titleTextBBox.width;
+		}
 
 		// Render the background
 		tmpBBox = tooltipText.getBBox();
@@ -79,10 +84,8 @@ function(Tooltip) {
 		this._tooltipBG = tooltipBG;
 		var tooltipBGBBox = tooltipBG.getBBox();
 
-		if (secondaryText) {
-			var tooltipBGBBox = tooltipBG.getBBox();
-			this.groupBoundary = TOOLTIP_PADDING_LEFT + GROUP_SPACING + titleText.getBBox().width;
 
+		if (secondaryText) {
 			var separator = paper.line(
 				this.groupBoundary,
 				0,
