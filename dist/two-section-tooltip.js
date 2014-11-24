@@ -26,7 +26,7 @@ function(Tooltip) {
 		var paper = this._paper;
 		var tmpBBox = null;
 
-		if (this.node !== null) {
+		if (this.node != undefined) {
 			this.remove();
 		}
 		this.node = paper.g();
