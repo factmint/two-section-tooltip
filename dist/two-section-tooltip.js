@@ -26,10 +26,10 @@ function(Tooltip) {
 		var paper = this._paper;
 		var tmpBBox = null;
 
-		if (this.node != undefined) {
+		if (this.snapElement != undefined) {
 			this.remove();
 		}
-		this.node = paper.g();
+		this.snapElement = paper.g();
 
 		// Render the text
 		var tooltipText;
@@ -126,17 +126,17 @@ function(Tooltip) {
 		this._positionTooltipArrow(this._tooltipPlacement);
 
 		// Add to the group
-		this.node.append(tooltipBG);
-		this.node.append(tooltipBGOverlay);
-		this.node.append(tooltipText);
-		this.node.append(tooltipArrow);
-		this.node.append(separator);
+		this.snapElement.append(tooltipBG);
+		this.snapElement.append(tooltipBGOverlay);
+		this.snapElement.append(tooltipText);
+		this.snapElement.append(tooltipArrow);
+		this.snapElement.append(separator);
 
-		this.node.addClass('fm-tooltip');
+		this.snapElement.addClass('fm-tooltip');
 
 		this.hide();
 
-		return this.node;
+		return this.snapElement;
 	};
 
 	/**
@@ -209,7 +209,7 @@ function(Tooltip) {
 	 */
 	TwoSectionTooltip.prototype.setPosition = function(x, y, tooltipPlacement) {
 
-		if (!this.node) {
+		if (!this.snapElement) {
 			return;
 		}
 
@@ -261,7 +261,7 @@ function(Tooltip) {
 
 		}
 
-		this.node.transform("T" + x + "," + y);
+		this.snapElement.transform("T" + x + "," + y);
 
 	};
 
