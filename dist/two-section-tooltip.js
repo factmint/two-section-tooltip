@@ -13,9 +13,10 @@ function(Tooltip) {
 	var TEXT_SIZE_SMALL = "12px";
 	var FONT_FAMILY = "'Lato', sans-serif";
 
-	function TwoSectionTooltip(paper, tooltipClass, colorClass) {
+	function TwoSectionTooltip(paper, tooltipClass, colorClass, tint) {
 
 		Tooltip.call(this, paper, tooltipClass, colorClass);
+		this.tint = (tint) ? tint : 1;
 
 	}
 
@@ -112,7 +113,7 @@ function(Tooltip) {
 		)
 			.attr('fill', 'white');
 		tooltipBGOverlay.attr('mask', tooltipBGMask);
-		tooltipBGOverlay.addClass(this.colorClass + ' tint-1');
+		tooltipBGOverlay.addClass(this.colorClass + ' tint-' + this.tint);
 
 
 		// Render the arrow
@@ -155,7 +156,7 @@ function(Tooltip) {
 				transformMatrix.translate(tooltipBGBBox.width + 4, tooltipBGBBox.height / 2);
 				transformMatrix.rotate(180);
 				this._tooltipArrow.transform( transformMatrix.toTransformString() );
-				this._tooltipArrow.addClass('tint-1');
+				this._tooltipArrow.addClass('tint-' + this.tint);
 				break;
 
 			case "right":
@@ -179,7 +180,7 @@ function(Tooltip) {
 				transformMatrix.translate((tooltipBGBBox.width + this.groupBoundary) / 2, tooltipBGBBox.height + 4);
 				transformMatrix.rotate(-90);
 				this._tooltipArrow.transform(transformMatrix.toTransformString());
-				this._tooltipArrow.addClass('tint-1');
+				this._tooltipArrow.addClass('tint-' + this.tint);
 				break;
 
 			case "bottomRight":
@@ -192,7 +193,7 @@ function(Tooltip) {
 				transformMatrix.translate((tooltipBGBBox.width + this.groupBoundary) / 2, -4);
 				transformMatrix.rotate(90);
 				this._tooltipArrow.transform(transformMatrix.toTransformString());
-				this._tooltipArrow.addClass('tint-1');
+				this._tooltipArrow.addClass('tint-' + this.tint);
 				break;
 
 		}
