@@ -19,6 +19,6 @@
     "tests"
   ],
   "dependencies": {
-    "Tooltip": "https://git.assembla.com/descartes_diaphragm.tooltip.git"
+    "Tooltip": "https://github.com/factmint/tooltip.git"
   }
 }
